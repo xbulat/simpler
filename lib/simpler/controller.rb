@@ -20,21 +20,28 @@ module Simpler
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
 
-      set_headers
+      set_default_headers
       send(action)
       write_response
 
       @response.finish
     end
 
-    private
+    def set_params(params)
+      @request.env['simpler.params'] = params.merge(@request.params.transform_keys(&:to_sym))
+    end
 
+    private
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_headers(type = nil)
-      @response['Content-Type'] = HEADERS.fetch(type, 'text/html')
+    def set_default_headers
+      @response['Content-Type'] = 'text/html'
+    end
+
+    def set_headers(type = :html)
+      @response['Content-Type'] = HEADERS.fetch(type)
     end
 
     def write_response
@@ -56,7 +63,7 @@ module Simpler
       @response.status = code
     end
 
-    def header
+    def headers
       @response
     end
 
