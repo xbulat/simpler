@@ -8,18 +8,14 @@ module Simpler
         @path = path
         @controller = controller
         @action = action
-        @path_regexp = path_regexp(path)
       end
 
-      def match?(env)
-        @request = Rack::Request.new(env)
-        request_method = @request.request_method.downcase.to_sym
-        @request_path = @request.path_info
-        @method == request_method && path_match?(@request_path)
+      def match?(request_method, request_path)
+        @method == request_method && request_path.match(path_regexp)
       end
 
-      def route_params
-        params(@request_path) if path_with_params? || {}
+      def route_params(request_path)
+        params(request_path) if path_with_params? || {}
       end
 
       private
@@ -28,12 +24,8 @@ module Simpler
         request_path.match(params_regexp).named_captures.transform_keys(&:to_sym)
       end
 
-      def path_match?(request_path)
-        request_path.match(@path_regexp)
-      end
-
-      def path_regexp(path)
-        Regexp.new(path.gsub(/\:\w+/, '\w+') + '$')
+      def path_regexp
+        Regexp.new(@path.gsub(/\:\w+/, '\w+') + '$')
       end
 
       def path_with_params?
@@ -41,7 +33,11 @@ module Simpler
       end
 
       def params_regexp
-        Regexp.new(@path.gsub(/\:\w+/) {|e| "(?<#{e.delete(':')}>\\w+)"})
+        params_regexp = @path.gsub(/\:\w+/) do |e|
+          "(?<#{e.delete(':')}>\\w+)"
+        end
+
+        Regexp.new(params_regexp)
       end
     end
   end

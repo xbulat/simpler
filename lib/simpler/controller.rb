@@ -37,11 +37,11 @@ module Simpler
     end
 
     def set_default_headers
-      @response['Content-Type'] = 'text/html'
+      headers['Content-Type'] = 'text/html' if headers['Content-Type'].nil?
     end
 
-    def set_headers(type = :html)
-      @response['Content-Type'] = HEADERS.fetch(type)
+    def set_content_type(type = :html)
+      headers['Content-Type'] = HEADERS.fetch(type)
     end
 
     def write_response
@@ -71,7 +71,7 @@ module Simpler
       render = template.is_a?(Hash) ? template : { html: template }
       type = render.keys.first
 
-      set_headers(type)
+      set_content_type(type)
       @request.env["simpler.template.#{type}"] = render[type]
     end
   end

@@ -10,8 +10,8 @@ module Simpler
     end
 
     def self.render_type(env)
-      template = env.keys.select { |type| type.match(/simpler.template./) }
-      template.any? ? template.first.split('.').last : DEFAULT_RENDER
+      template = env.keys.grep(/simpler\.template\.(\w+)/){$1}
+      template.any? ? template.first : DEFAULT_RENDER
     end
   end
 end

@@ -32,8 +32,8 @@ module Simpler
 
       controller = route.controller.new(env)
       action = route.action
-      controller.set_params(route.route_params)
-      
+      controller.set_params(route.route_params(controller.request.path_info))
+
       make_response(controller, action)
     end
 
