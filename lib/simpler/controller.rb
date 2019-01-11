@@ -37,7 +37,7 @@ module Simpler
     end
 
     def set_default_headers
-      headers['Content-Type'] = 'text/html' if headers['Content-Type'].nil?
+      headers['Content-Type'] ||= 'text/html'
     end
 
     def set_content_type(type = :html)
